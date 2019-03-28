@@ -4,6 +4,7 @@
   "private": true,
   "devDependencies": {
     "jest": "23.6.0",
+    "prettier": "^1.16.4",
     "react-scripts": "^2.1.8"
   },
   "dependencies": {

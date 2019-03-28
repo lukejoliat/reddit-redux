@@ -1,7 +1,11 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { selectSubreddit, fetchPostsIfNeeded, invalidateSubreddit } from '../actions'
+import {connect} from 'react-redux'
+import {
+  selectSubreddit,
+  fetchPostsIfNeeded,
+  invalidateSubreddit,
+} from '../actions'
 import Picker from '../components/Picker'
 import Posts from '../components/Posts'
 
@@ -11,17 +15,17 @@ class App extends Component {
     posts: PropTypes.array.isRequired,
     isFetching: PropTypes.bool.isRequired,
     lastUpdated: PropTypes.number,
-    dispatch: PropTypes.func.isRequired
+    dispatch: PropTypes.func.isRequired,
   }
 
   componentDidMount() {
-    const { dispatch, selectedSubreddit } = this.props
+    const {dispatch, selectedSubreddit} = this.props
     dispatch(fetchPostsIfNeeded(selectedSubreddit))
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps.selectedSubreddit !== this.props.selectedSubreddit) {
-      const { dispatch, selectedSubreddit } = this.props
+      const {dispatch, selectedSubreddit} = this.props
       dispatch(fetchPostsIfNeeded(selectedSubreddit))
     }
   }
@@ -31,16 +35,16 @@ class App extends Component {
   }
 
   handleNextClick = e => {
-    const { dispatch, selectedSubreddit, after } = this.props
-    let params;
+    const {dispatch, selectedSubreddit, after} = this.props
+    let params
     if (after) params = `?after=${after}`
     dispatch(invalidateSubreddit(selectedSubreddit))
     dispatch(fetchPostsIfNeeded(selectedSubreddit, params))
   }
 
   handlePrevClick = e => {
-    const { dispatch, selectedSubreddit, before } = this.props
-    let params;
+    const {dispatch, selectedSubreddit, before} = this.props
+    let params
     if (before) params = `?after=${before}`
     dispatch(invalidateSubreddit(selectedSubreddit))
     dispatch(fetchPostsIfNeeded(selectedSubreddit, params))
@@ -48,60 +52,65 @@ class App extends Component {
 
   handleRefreshClick = e => {
     e.preventDefault()
-    const { dispatch, selectedSubreddit } = this.props
+    const {dispatch, selectedSubreddit} = this.props
     dispatch(invalidateSubreddit(selectedSubreddit))
     dispatch(fetchPostsIfNeeded(selectedSubreddit))
   }
 
   render() {
-    const { selectedSubreddit, posts, isFetching, lastUpdated, error } = this.props
+    const {
+      selectedSubreddit,
+      posts,
+      isFetching,
+      lastUpdated,
+      error,
+    } = this.props
     const isEmpty = posts.length === 0
     return (
       <div>
-        <Picker value={selectedSubreddit}
-                onChange={this.handleChange}
-                options={[ 'reactjs', 'frontend' ]} />
+        <Picker
+          value={selectedSubreddit}
+          onChange={this.handleChange}
+          options={['reactjs', 'frontend']}
+        />
+        <h2>{error && 'There was an Error'}</h2>
         <p>
-        {error && 'There was an Error'}
-        </p>
-        <p>
-          {lastUpdated &&
+          {lastUpdated && (
             <span>
               Last updated at {new Date(lastUpdated).toLocaleTimeString()}.
             </span>
-          }
-          {!isFetching &&
-            <button onClick={this.handleRefreshClick}>
-              Refresh
-            </button>
-          }
+          )}
+          {!isFetching && (
+            <button onClick={this.handleRefreshClick}>Refresh</button>
+          )}
         </p>
-        {isEmpty
-          ? (isFetching ? <h2>Loading...</h2> : <h2>Empty.</h2>)
-          : <div style={{ opacity: isFetching ? 0.5 : 1 }}>
-              <Posts posts={posts} />
-            </div>
-        }
-        <button onClick={this.handlePrevClick}>
-          Previous Page
-        </button>
-        <button onClick={this.handleNextClick}>
-          Next Page
-        </button>
+        {isEmpty ? (
+          isFetching ? (
+            <h2>Loading...</h2>
+          ) : (
+            <h2>Empty.</h2>
+          )
+        ) : (
+          <div style={{opacity: isFetching ? 0.5 : 1}}>
+            <Posts posts={posts} />
+          </div>
+        )}
+        <button onClick={this.handlePrevClick}>Previous Page</button>
+        <button onClick={this.handleNextClick}>Next Page</button>
       </div>
     )
   }
 }
 
 const mapStateToProps = state => {
-  const { selectedSubreddit, postsBySubreddit } = state
+  const {selectedSubreddit, postsBySubreddit} = state
   const {
     isFetching,
     lastUpdated,
     items: posts,
     error,
     before,
-    after
+    after,
   } = postsBySubreddit[selectedSubreddit] || {
     isFetching: true,
     items: [],
@@ -114,7 +123,7 @@ const mapStateToProps = state => {
     lastUpdated,
     error,
     before,
-    after
+    after,
   }
 }
 
